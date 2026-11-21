@@ -1,0 +1,28 @@
+name: 编译汉化APK
+on:
+  push:
+    branches: ['**']
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: 依赖
+        run: flutter pub get
+      - name: 编译（release，已内置签名）
+        run: flutter build apk --release
+      - name: 改名为中文版文件名
+        run: cp build/app/outputs/flutter-apk/app-release.apk PerfMTK-Manager-中文版.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PerfMTK-Manager-中文版
+          path: PerfMTK-Manager-中文版.apk
+          if-no-files-found: error
